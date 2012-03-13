@@ -1,0 +1,405 @@
+
++++
+
+sbcl --lose-on-corruption --disable-ldb --dynamic-space-size 1024
+
+(require 'asdf)
+(asdf:oos 'asdf:load-op 'swank)
+(setf swank::*loopback-interface* "0.0.0.0")
+
+(swank:create-server :coding-system "utf-8-unix" :dont-close t)
+
+(swank:create-server :coding-system "utf-8-unix" :dont-close t :port 8008)
+
+ssh -2 -N -f -L 8008:localhost:8008 gtadm@gdestroytorg.ru
+
+
+(defun clear ()
+  (loop :for var :being :the :symbols :in :wizard.impl.routes :do (unintern var))
+  (restas:reconnect-all-routes))
+
+(clear)
+
+
+(restas:start '#:wizard :port 8081)
+(restas:debug-mode-on)
+
+[01:37] rigidus> я бы хотел, чтобы во время доступа (на чтение или
+запись) к слоту некоего объекта вызывался метод этого объекта. куда
+смотреть?
+[06:03] dmitry_vk> rigidus: это можно сделать через MOP. См. методы
+slot-value-using-class и (setf slot-value-using-class)
+
+
+[21:09] rigidus> dmitry_vk: а что означает эта декларация? (declaim (ftype (function (integer &key (:on-error symbol))) f))
+[21:09] dmitry_vk> Что f - это функция, которая принимает одно целое и
+имеет ключевой параметр :on-error типа symbol
+[21:10] dmitry_vk> LinkFly: хм, нет. :on-error - это имя параметра
+(имя - это keyword), а symbol - его тип
+[21:11] rigidus> а тип возвращаемого значения этой функции указать
+можно?
+[21:11] dmitry_vk> Да, можно, после списка аргументов:
+(ftype (function (arg-1-type .. arg-n-type) result-type))
+[21:12] LinkFly> можно даже нескольких через (values result-type ...)
+
+
+Кто бы там что ни говорил, а программирование под Unix не может не
+радовать своей простотой. Когда я писал программы под Windows
+взаимодействие с ОСью было куда менее простым и прозрачным. А если
+сюда ещё добавить мощь языка Common Lisp, а также хорошую лисп-систему
+(например SBCL), то разработка поднимается на принципиально другой
+уровень по сравнению с традиционным программированием на Си. Ниже
+представлена ф-ия безопасной записи в файл. Безопасной в том смысле,
+что если несколько процессов используют её для записи в один и тот же
+файл, то возможность коллизии (т.е. порчи записываемых одновременно
+данных) абсолютно исключена.
+
+(defparameter *safe-write-sleep* 0.01)
+(defun safe-write (pathname string &aux stream)
+  (setf stream (open pathname :direction :output :if-does-not-exist :create :if-exists :append))
+  (unwind-protect
+       (loop
+          until (block try-lock
+                  (handler-bind ((error (lambda (condition)
+                                          (if (= sb-posix:eagain
+                                                 (sb-posix:syscall-errno condition))
+                                              (return-from try-lock)
+                                              (error condition)))))
+                    (sb-posix:lockf stream sb-posix:f-tlock 0)
+                    (princ string stream)
+                    (close stream)))
+          do (sleep *safe-write-sleep*))
+    (close stream)))
+
+http://linkfly.livejournal.com/2891.html
+
+;; Получение имени пользователя
+SB-POSIX> (defun get-username (&aux (pid (getpid))) ;(getenv "USERNAME"))
+           (passwd-name
+            (getpwuid
+             (stat-uid
+              (stat (format nil "/proc/~A" pid))))))
+
+
+[16:38] laser1234> (setenv "CL_SOURCE_REGISTRY"
+ "(:source-registry
+ (:tree \"/home/user/lisp/libs/\")
+ (:tree \"/home/user/projects/\")
+ :inherit-configuration)")
+[16:38] laser1234> Кусок init.el
+[16:38] laser1234> После этого lisp/libs/ и projects/ сканируются
+рекурсивно.
+[16:38] laser1234> (setenv "CL_SOURCE_REGISTRY"
+ "(:source-registry
+ (:tree \"/home/user/lisp/libs/\")
+ (:tree \"/home/user/projects/\")
+ :inherit-configuration)")
+[16:38] laser1234> Кусок init.el
+[16:38] laser1234> После этого lisp/libs/ и projects/ сканируются
+рекурсивно.
+[17:37] laser1234> Ну хорошо, тогда по старинке (push #"path/to/libs/"
+asdf:*central-registry*)
+[17:39] jsv> а чего через окружение, а не в
+~/.config/common-lisp/source-registry.conf?
+
+
+Хочется странного: отметить блок в буфере, нажать на какую-нибудь
+кнопку так, чтобы блок подался некоему скрипту на stdin, затем то что
+скрипт выдаст в stdout, emacs вставил в буфер вместо выделенного
+блока.
+Запускать скрипты awk, и прочие.
+Есть уже подобная фича?
+
+C-u M-|
+http://www.emacswiki.org/emacs/ExecuteExternalCommand
+
+
+[19:47] edgbla> а как сделать чтобы диред не открывал стопицот буферов
+когда шастаешь по каталогам? мене вроде одного достаточно...
+[20:01] Ioda> edgbla: dired-single.el
+
+
+[2011-10-11 02:49] LinkFly> rigidus: с работающими тредами это больно
+круто:) но можно попробовать их притормозить, сохранить образ и потом
+запустить. Код подготавливающий сохранение образа можно добавить как
+хук, в список sb-ext:*save-hooks* (определенные там ф-ии срабатывают
+при вызове save-lisp-and-die. Ф-ию с кодом, восстанавливающим
+состояние, можно поместить в значение ключа :top-level ф-ии
+save-lisp-and-die.
+
+
+
+;; Поиск и выполнение произвольных методов объекта
+
+(defclass test-obj ()
+  ((test-method :initarg :test-method :initform nil :accessor a-test-method)))
+
+(defparameter *test-example*
+  (make-instance 'test-obj :test-method 'a))
+
+(funcall (closer-mop:method-function
+          (find-method #'a-test-method '() (mapcar #'find-class '(test-obj))))
+         (list *test-example*) '())
+
+
+
+[17:02] dmitry_vk> "Open Implementations and Metaobject Protocols", by
+Gregor Kiczales and Andreas Paepcke - ИМХО, более хорошее введение в
+суть MOP'а, чем AMOP
+
+
+[01:02] LinkFly> ещё есть slime-list-threads, hot key - C-c C-x t -
+там можно манипулировать потоками
+[01:15] LinkFly> rigidus: разобрался с буфером? Тм очень просто: ? -
+описание команд. Можно выделить несколько потоков, как обычно
+выделяешь текст, нажать k - и они убьются, достаточно удобно.
+
+[22:40] zeldan@jabber.ru> https://github.com/Zeldan,
+sbushnjak@gmail.com для почты и чата...
+
+
+http://www.slideshare.net/chaitanyagupta/slime-1180051
+  10. Evaluation
+          * C-x C-e M-x slime-eval-last-expression
+          * C-M-x M-x slime-eval-last-defun
+          * C-c C-r M-x slime-eval-region
+  11. Compilation
+          * C-c C-c M-x slime-compile-defun
+          * C-c C-k M-x slime-compile-and-load-file
+          * M-n M-x slime-next-note
+          * M-p M-x slime-previous-note
+  12. Completion
+          * TAB M-x slime-complete-symbol
+          * M-TAB M-x slime-fuzzy-complete-symbol
+  13. Documentation
+          * SPC M-x slime-space
+          * C-c C-d d M-x slime-describe-symbol
+          * C-c C-d a M-x slime-apropos
+          * C-c C-d h M-x slime-hyperspec-lookup
+  14. Finding Definitions
+          * M-. M-x slime-edit-definition
+          * M-, M-* M-x slime-pop-find-definition-stack
+          * (the “Meta-point” commands)
+  15. Inspector
+          * C-c I M-x slime-inspect
+          * Some Inspector commands
+                o RET M-x slime-inspector-operate-on-point
+                o l M-x slime-inspector-pop
+                o n M-x slime-inspector-next
+                o M-RET M-x slime-inspector-copy-down
+  16. Cross-reference
+          * C-c C-w c M-x slime-who-calls
+          * C-c C-w w M-x slime-calls-who
+          * C-c C-w r M-x slime-who-references
+          * C-c C-w b M-x slime-who-binds
+          * C-c C-w s M-x slime-who-sets
+  17. Disassembly
+          * C-c M-d M-x slime-disassemble-symbol
+          * C-c C-t M-x slime-toggle-trace-definition
+          * M-x slime-untrace-all
+  18. SLDB: the SLIME debugger
+          * Examining Frames
+                o t M-x sldb-toggle-details
+                o v M-x sldb-show-source
+                o e M-x sldb-eval-in-frame
+                o i M-x sldb-inspect-in-frame
+  19. SLDB: the SLIME debugger
+          * Frame Navigation
+                o n M-x sldb-down
+                o p M-x sldb-up
+                o M-n M-x sldb-details-down
+                o M-p M-x sldb-details-up
+  20. SLDB: the SLIME debugger
+          * Miscellaneous commands
+                o r M-x sldb-restart-frame
+                o R M-x sldb-return-from-frame
+                o C M-x sldb-inspect-condition
+                o q M-x sldb-quit
+  21. How CL helps
+          * eval
+          * compile, compile-file, load
+          * describe, documentation
+          * apropos
+          * sb-introspect:who-calls, sb-introspect:who-references,
+   etc.
+          * disassemble
+          * trace, step
+          * inspect
+# CL Resources
+    * Paredit -- http://mumble.net/~campbell/emacs/paredit.el
+# CL Resources
+    * Books
+
+          o Practical Common Lisp (by Peter Seibel)
+          http://www.gigamonkeys.com/book/
+
+          o Common Lisp: A Gentle Introduction to Symbolic Computation
+          http://www-cgi.cs.cmu.edu/afs/cs.cmu.edu/user/dst/www/LispBook/index.html
+
+          o On Lisp (by Paul Graham)
+          http://www.paulgraham.com/onlisp.html
+
+          o Paradigms of AI Programming: Case Studies in Common Lisp
+          (by Peter Norvig) http://norvig.com/paip.html
+
+          o Structure and Interpretation of Computer Programs (by
+          Harold Abelson and Gerald Jay Sussman with Julie Sussman)
+          http://mitpress.mit.edu/sicp/
+
+# CL Resources
+
+    * CL Tutorials
+
+          o Casting SPELs in Lisp
+          http://www.lisperati.com/casting.html
+
+          o A Tutorial on Conditions and Restarts
+          http://chaitanyagupta.com/lisp/restarts.html
+
+          o Lisp for the Web
+          http://www.adampetersen.se/articles/lispweb.htm
+
+
+http://habrahabr.ru/blogs/algorithm/132128/ - Shift-OR
+
+
+
+[01:36] rigidus> Ну строго говоря я хотел бы делать всякие вещи после
+того как пришел запрос, но до того как он начал роутиться
+[01:36] rigidus> мне для этого использовать декораторы или что?
+[01:37] rigidus> archimag: ?
+[01:37] archimag> rigidus: да
+[01:37] rigidus> archimag: ага, ок
+[01:37] archimag> хотя
+[01:37] archimag> если до того, как он начал роутиться
+[01:37] archimag> то не
+[01:37] rigidus> а как быть?
+[01:38] archimag> надо на уровне acceptor перегружать
+[01:38] rigidus> это как?
+[01:38] rigidus> я бы хотел иметь (defmethod restas :around... ^_^
+[01:38] archimag> определяешь свой класс acceptor, который наследует
+от restas-acceptor
+[01:39] archimag> ну что бы сделать свой defmethod надо свой класс
+иметь
+[01:39] archimag> вот, можно сделать наследника от restas-acceptor
+[01:39] rigidus> мне бы пример кода, а то боюсь запутаться и уйти не
+туда
+[01:39] archimag> и тупо хак, для restas::*acceptors* сделать
+change-class
+[01:40] archimag> посмотри код restas/src/hunchentoot.lisp
+[01:40] archimag> я сейчас тут не могу долго присутствовать
+[01:41] archimag> или напиши в форуме, там за несколько дней можно
+будет чего-нибудь соорудить
+[01:41] rigidus> хорошо, напишу на форуме
+[01:45] archimag> rigidus: смотри пример
+https://github.com/archimag/restas/blob/master/example/custom-acceptor.lisp
+[01:46] archimag> rigidus: тока нужен restas из git
+[01:46] archimag> rigidus: таким же образом определяешь свой acceptor
+и переопределяешь для него что хочешь, подробности в доке на
+Hunchentoot
+[01:47] rigidus> ага, ок, а почему нужен restas из git? что-то
+обновилось?
+[01:48] rigidus> логгинг вижу, а свой функционал добавлять куда - не
+понимаю
+[01:49] archimag> теперь в restas:start появился ключ :acceptor-class,
+там можно указать свой класс акцептора
+[01:50] archimag> опеределяешь свой acceptor, определяешь для него что
+хочешь
+[01:50] archimag> http://weitz.de/hunchentoot/#acceptors
+[01:51] archimag> hunchentoot:acceptor-dispatch-request - основной
+метод, в котором происходит обработка запроса
+[01:52] archimag> делаешь для него around и всё
+[01:52] archimag>
+http://weitz.de/hunchentoot/#acceptor-dispatch-request
+[02:08] rigidus> Большое спасибо!
+[2011-11-28 01:49] archimag> теперь в restas:start появился ключ
+:acceptor-class, там можно указать свой класс акцептора
+[2011-11-28 01:50] archimag> опеределяешь свой acceptor, определяешь
+для него что хочешь
+[2011-11-28 01:50] archimag> http://weitz.de/hunchentoot/#acceptors
+[2011-11-28 01:51] archimag> hunchentoot:acceptor-dispatch-request -
+основной метод, в котором происходит обработка запроса
+[2011-11-28 01:52] archimag> делаешь для него around и всё
+
+[17:38] Macro> а есть ли способ сказать (format) в CL чтобы он nil не
+печатал вообще?
+[17:39] Macro> например (format nil "~a" (foo)), если foo вернёт nil -
+то будет напечатано "NIL", а мне надо чтобы было ""
+[17:39] Macro> а если (foo) вернёт число или строку - то нужно чтобы
+была строка или число напечатано
+[17:41] jsv> ~@[~a~]
+
+[2011-12-08 01:05] LinkFly> в SBCL переданные параметры можно получить
+так: SB-EXT:*POSIX-ARGV*
+
+http://gq.net.ru/2009/12/16/git-history-rewrite/ - Редактирование
+истории GIT
+
+emacs:help
+C-h r m dired
+C-h i d m dired-x
+
+
+[12:53] asvil> как полностью в кл изолировать поток?
+Частный вид: чтобы declare special, def(var/parameter/fun/macro)
+влияли только на текущий поток?
+[12:53] asvil> declare special и так наверно только в текущем треде
+видна?
+[12:59] gravicappa> (make-thread
+                      (lambda ()
+                         (let* ((*package* (find-package :sandbox))
+                                (x (compile (lambda ()
+                                              (remove-intern&make-symbol&read-from-string&extern-symbols code)))))
+                            (x))))
+
+
+Как переписать апачевские правила для Drupal:
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+при использовании nginx/FastCGI ?
+Вот так:
+location / {
+   try_files      $uri  $uri/  @drupal;
+}
+location @drupal {
+   fastcgi_pass   ...;
+   fastcgi_param  SCRIPT_FILENAME  /path/to/index.php;
+   fastcgi_param  SCRIPT_NAME      /index.php;
+   fastcgi_param  QUERY_STRING     q=$uri&$args;
+   ... прочие fastcgi_param
+}
+http://habrahabr.ru/blogs/programming/136706/ - про php в режиме FastCGI
+
+
+
+-----------------------------
+
+
+[14:12] fedorov@jabber.ru> в файле плейсис.лисп я сделал искусственное
+разделение на
+multi-post-grid - стр.184,207,226
+multi-tend-grid - стр.332
+
+их можно объединить общим multi-grid, но так лучше демонстрируется
+ифейс.лисп
+[14:13] fedorov@jabber.ru> в ифейс.лисп два вложенный флета
+внешний       flet - стр.58
+внутренний  flet - стр.78
+
+[14:15] fedorov@jabber.ru> в 90 строке вызывается body-change из
+внутреннего флета
+сам body-change можно было реализовать через if, но я поставил cond -
+на будущее (для примера)
+[14:17] fedorov@jabber.ru> если очередной удовлетворяет какому-либо
+cond-у - вызывается соответствующая ф-ция из внешнего флета
+[14:18] fedorov@jabber.ru> в данном случае - это одна и та же ф-ция
+(но могёшь определить скока хошь)
+[14:19] fedorov@jabber.ru> если ни один из cond-ов не подошёл -
+элемент вставляется "как есть"
+[14:21] fedorov@jabber.ru> то есть можно вставлять как
+кодогенерированные куски по правам доступа, так и любые другие
+изменения (в будущем)
+[14:21] fedorov@jabber.ru> чё не понял - спрашивай
+[14:22] fedorov@jabber.ru> залить пока не могу - 504 Gateway Time-out
+---

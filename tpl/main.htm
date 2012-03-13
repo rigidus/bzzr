@@ -1,0 +1,185 @@
+// -*- mode: closure-template-html; fill-column: 130 -*-
+
+{namespace tpl}
+
+{template postelt}
+  <tr>
+    <td>{$date}</td>
+    <td>
+      <h3>{$title}</h3>
+      {$photoannounce  |noAutoescape}
+      <a href="{$xref}">
+        {$announce}
+      </a>
+    </td>
+  </tr>
+{/template}
+
+{template postblock}
+  <div class="news_list">
+  	<a href="#" class="right"><img src="img/icons/rss2.png" alt="" style="margin: 0 5px 0 0;"/></a>
+    <a href="{$xrefall}" class="right">{$titleall |noAutoescape}</a>
+    <h2>{$title |noAutoescape}</h2>
+    <table class="news_list">
+      {foreach $elt in $posts}
+        {call postelt data="$elt" /}
+      {/foreach}
+    </table>
+  </div>
+{/template}
+
+{template postpage}
+  {foreach $elt in $postblocks}
+    {call postblock data="$elt" /}
+  {/foreach}
+{/template}
+
+{template main}
+  <!-- div class="banner_center"></div -->
+
+  {foreach $elt in $postblocks}
+    {call postblock data="$elt" /}
+  {/foreach}
+
+  <!-- div class="action">
+    <a href="news_list.html" class="right">Все акции</a><h2><img src="img/icons/rss_add.png" alt="" /> Акции, скидки и предложения</h2>
+    <table>
+      <tr>
+        <td>
+          <img src="img/trash/file-roller.png" alt="" />
+          <h3>Акция от компании "Невастрой"</h3>
+          <a href="news.html">
+            Комплект включает в себя материалы, значительный набор крепежа, полный ассортимент торцевых шпонок. Доставка
+            бесплатно
+          </a>
+        </td -->
+        <!--
+           <td>
+             <img src="img/trash/navigation-right-button_basic_red.png" alt="Картинка в новости" />
+           </td>
+           -->
+      <!-- /tr>
+      <tr>
+        <td>
+          <img src="img/trash/cad.png" alt="" />
+          <h3>Сезонное предложение от "КирпичПром"</h3>
+          <a href="news.html">
+            При покупке 5000 шт. Вам предоставляется еще 100 шт. бесплатно
+          </a>
+        </td -->
+        <!--
+           <td>
+             <img src="img/trash/hard-drive-download_sticker.png" alt="Картинка в новости" />
+           </td>
+           -->
+      <!-- /tr>
+      <tr>
+        <td>
+          <img src="img/trash/561612.jpg" alt="" />
+          <h3>Распродажа со складов "ГипроРусь"</h3>
+          <a href="news.html">
+            Беспрецендентное предложени - гипсокартон по цене туалетной бумаги. До 3000 листов в одни руки. Скидки
+            постоянным покупателям. Самовывоз. Оплата по безналу.
+          </a>
+        </td -->
+        <!--
+           <td>
+             <img src="img/trash/icq_protoco2l.png" alt="Картинка в новости" />
+           </td>-->
+      <!-- /tr>
+    </table>
+  </div -->
+  <!-- div class="new_company">
+    <a href="#" class="right">Все новые поставщики</a>
+    <h2>Обновления в каталоге поставщиков</h2>
+    <table>
+      <tr>
+        <td>
+          <h3>
+            <a href="#">ОАО "Росинка"</a>
+          </h3>
+          <span>В разделе:</span>
+          <a href="#">Каркасные конструкции</a>,
+          <a href="#">Кирпич</a>,
+          <a href="#">Вентиляторы.</a></td>
+      </tr>
+      <tr>
+        <td>
+          <h3>
+            <a href="#">ЗАО "СургутБетон - дистрибьютед"</a>
+          </h3>
+          <span>В разделе:</span>
+          <a href="#">Сендвич-панели</a>,
+          <a href="#">Бетон</a>,
+          <a href="#">Арматура</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h3>
+            <a href="#">ИП Печкин А.И.</a>
+          </h3>
+          <span>В разделе:</span>
+          <a href="#">Металлочерепица</a>,
+          <a href="#">Строительные работы</a>,
+          <a href="#">Печные работы</a>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="new_tech">
+    <a href="#" class="right">Все технологии</a>
+    <h2>Технологии</h2>
+    <table>
+      <tr>
+        <td>23.10.2011</td>
+        <td>
+          <h3>Открывая двери - сохраняем тепло!</h3>
+          <a href="#">
+            Технология аккумуляции тепла в отдельном помещении за счет применения кинетической энергии при открывании
+            дверей
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td>12.10.2011</td>
+        <td>
+          <h3>Кирпич-долгожитель</h3>
+          <a href="#">
+            Новый тип кирпичей. Теперь кирпич может прослужить до 1000 лет. Огнеупорен и морозоустойчив. Применена новая
+            технология обжига.
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td>04.10.2011</td>
+        <td>
+          <h3>Новый типовой проект (№2002) жилого дома</h3>
+          <a href="#">
+            Разработан новый типовой проект жилого дома. Проект отличается простотой монтажа, устойчивостью к
+            сейсмоактивности и высоким температурам.
+          </a>
+        </td>
+      </tr>
+    </table>
+  </div -->
+  <!--
+     <div class="raiting_company left">
+       <h2>Рейтинг компаний</h2>
+       <table>
+         <tr>
+           <td>ЗАО "МоскоуПрезент"</td>
+           <td>*****</td>
+         </tr>
+         <tr>
+           <td>ОАО "Питерские Печные Работы"</td>
+           <td>****</td>
+         </tr>
+         <tr>
+           <td>ЗАО "СтройИнвест ОптТорг РетейлГрупп Охтинские Мастера"</td>
+           <td>******</td>
+         </tr>
+       </table>
+     </div>
+     -->
+{/template}

@@ -1,0 +1,46 @@
+// -*- mode: closure-template-html; fill-column: 130 -*-
+
+{namespace tpl}
+
+{template tender}
+
+<div class="gray corners">
+<div class="tender_description">
+<h2>Тендер № <number_purchase></h2>
+
+<table>
+  <tr>
+    <td><b>Тип закупки:</b></td>
+    <td><type_purchase></td>
+  </tr>
+  <tr>
+    <td><b>Название закупки:</b></td>
+    <td><name_purchase></td>
+  </tr>
+  <tr>
+    <td colspan="2"><u><b>Период проведения закупки:</b></u></td>
+  </tr>
+  <tr>
+    <td><b>Дата начала:</b> <start></td>
+    <td><b>Дата окончания:</b> <finish></td>
+  </tr>
+  <tr>
+    <td><u><b>Сумма закупки:<b></u></td>
+    <td><summa></td>
+  </tr>
+  <tr>
+    <td colspan="2"><h3 class="win">Победители закупки</h3></td>
+  </tr>
+  <tr>
+    <td colspan="2"><b>ЛОТ:</b> <name_lot></td>
+  </tr>
+  <tr>
+    <td><b>Организация:</b> <name_win_company></td>
+    <td><b>Контактная информация:</b> <contacts></td>
+  </tr>
+</table>
+</div>
+<em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
+</div>
+
+{/template}

@@ -1,0 +1,168 @@
+// -*- mode: closure-template-html; fill-column: 130 -*-
+
+{namespace tpl}
+
+{template root}
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">{\n}
+  <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru-ru" xmlns:vml="urn:schemas-microsoft-com:vml">{\n}
+    <head>{\n}
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />{\n}
+      <meta name="viewport" content="initial-scale=1.0, user-scalable=no" /><!-- YandexMaps recommended fix -->{\n}
+	  <title>{$headtitle}</title>{\n}
+	  <meta name="keywords" content="" />{\n}
+	  <meta name="description" content="" />{\n}
+      <meta name="robots" content="index, follow" />{\n}
+	  <link rel="stylesheet" href="/css/reset.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="/css/print.css" type="text/css" media="print" />{\n}
+   	  <link rel="stylesheet" href="/css/typograf.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="/css/style.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="/css/correctable.css" type="text/css" media="screen, projection" />{\n}
+	  <link href="http://fonts.googleapis.com/css?family=Cuprum&subset=cyrillic,latin" rel="stylesheet" type="text/css" />{\n}
+
+      <!--[if IE 6]>{\n}
+	  <link rel="stylesheet" href="/css/ie6.css" type="text/css" media="screen, projection" />{\n}
+	  <![endif]-->{\n}
+      <!-- YandexMaps -->{\n}
+      <script src="http://api-maps.yandex.ru/1.1/index.xml?key={$mapkey}" type="text/javascript"></script>{\n}
+      <!-- RSS -->{\n}
+      <link href="/index.php?format=feed&amp;type=rss" rel="alternate" type="application/rss+xml" title="RSS 2.0" />{\n}
+      <link href="/index.php?format=feed&amp;type=atom" rel="alternate" type="application/atom+xml" title="Atom 1.0" />{\n}
+      <!-- Favicon -->{\n}
+      <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />{\n}
+      <!-- JQuery -->
+      <script type="text/javascript" src="/js/jquery-1.6.2.min.js"></script>{\n}
+      <script type="text/javascript" src="/js/jquery-ui-1.8.16.custom.min.js"></script>{\n}
+      <script type="text/javascript" src="/js/bookmark.js"></script>{\n}
+      <link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui-1.8.16.custom.css" />{\n}
+      <!-- fix images -->
+      <link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui-1.8.1.custom.css" />{\n}
+      <!-- jqgrid -->
+      <link rel="stylesheet" type="text/css" media="screen" href="/css/ui.jqgrid.css" />{\n}
+      <script type="text/javascript" src="/js/grid.locale-ru.js"></script>{\n}
+      <script type="text/javascript" src="/js/jquery.jqGrid.min.js"></script>{\n}
+      <!-- my -->
+      <script src="/js/my.js" type="text/javascript"></script>{\n}
+
+    </head>
+    <body>
+      <div class="banner_top"></div>
+      <div class="wraper">
+        <div id="header">
+          <span class="service_link">
+            <a class="start_page" href="#" onclick="this.style.behavior='url(#default#homepage)'; this.setHomePage('http://gdestroytorg.ru');return false;">Сделать стартовой</a>
+            <a class="favorite" href="javascript:void(0);" onclick="return bookmark(this);">В избранное</a>
+          </span>
+          <a href="/"><div class="logo"></div></a>
+          <div class="speed_buttons">
+            <form action="/newtender" method="post" style="display:inline">{\n}
+              <a class="new_tender" href="#" onclick="jQuery(this).parent('form').submit(); return false;"><span>Объявить тендер</span></a>
+            </form>
+            <a class="express" href="#"><span>Экспресс-котировка</span></a>
+            <a class="store_map" href="/suppmap"><span>Карта поставщиков</span></a>{\n}
+          </div>
+          <div class="autorisation">
+            {$personal |noAutoescape}
+          </div>
+        </div>
+        <div class="tools_menu">
+          <a class="help" href="/help">Помощь</a>
+          <a class="board" href="#">Доска объявлений</a>
+          <a class="services" href="/about">О портале</a>
+          <a class="action" href="/sale">Акции</a>
+          <!-- <a class="rating" href="#">Рейтинги</a> -->
+        </div>
+        <div id="container">{\n}
+          <div id="content">{\n}
+            <div class="search corners">{\n}
+              <form action="/search" method="post" class="searh">{\n}
+                <input type="text" name="searchstring" value="{$searchstring}" maxlength="128" />{\n}
+                <select size="1" name="searchcategory">{\n}
+                  <!--{\n}
+                  <option value="all">везде</option>{\n}
+                  <option value="tender">по тендерам</option>{\n}
+                  <option value="builder">по застройщикам</option>{\n}
+                  -->{\n}
+                  <option value="supplier" {if $searchcategory == 'supplier'} selected="selected"{/if}>по поставщикам</option>{\n}
+                  <option value="map"      {if $searchcategory == 'map'}      selected="selected"{/if}>по карте</option>{\n}
+                  <option value="resource" {if $searchcategory == 'resource'} selected="selected"{/if}>по материалам</option>{\n}
+                  <!--{\n}
+                  <option value="tech">по технологиям</option>{\n}
+                  -->{\n}
+                </select>{\n}
+                <button type="submit">Искать</button>{\n}
+              </form>{\n}
+              <!--{\n}
+                 <span class="left">например <a href="#">пескосоляная смесь</a></span>{\n}
+                 <span class="right">или воспользуйтесь <a href="#">расширенным поиском</a></span>{\n}
+                 -->{\n}
+              <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>{\n}
+            </div>{\n}
+            <br />
+
+            {$content |noAutoescape}
+
+	      </div>{\n}
+        </div>
+        <div class="sidebar" id="left">
+	      <ul id="menu">
+            {foreach $elt in $navpoints}
+              {call navelt data="$elt" /}
+            {/foreach}
+          </ul>
+          <a href="http://www.wizardsoft.ru" target="_blank" title="Комплексная автоматизация управления затратами в строительстве"><div class="banner_left"></div></a>
+          <div class="tender_day corners">
+            <h1>Тендер дня</h1>
+            <strong><a href="#">Ремонт жилищ (квартир, домов) ООО "ВК-Систем", г. Санкт-Петербург</a></strong>
+            <i>Аукцион</i>
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td><p>Начало:</p></td>
+                <td>26.12.2011</td>
+              </tr>
+              <tr>
+                <td><p>Окончание:</p></td>
+                <td>11.01.2012</td>
+              </tr>
+            </table>
+            <span><a class="all_tender" href="#">Все тендеры</a></span>
+            <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
+          </div>
+          <div class="gray corners">
+           <h1>Партнеры</h1>
+            <div class="partners_block">
+             <a href="http://www.nwab.ru/" target="_blank"><img src="/img/partners/bank_associa.jpg" title="Ассоциация Банков Северо-Запада" alt="Ассоциация Банков Северо-Запада" /></a>
+             <a href="http://www.arspb.ru/" target="_blank"><img src="/img/partners/banner_arsp.jpg" title="Ассоциация Риэлторов Санкт Петербурга и Ленинградской области" alt="Ассоциация Риэлторов Санкт Петербурга и Ленинградской области" /></a>
+             <a href="http://www.spbexp.ru/" target="_blank"><img src="/img/partners/gosexpert.jpg" title="Центр Государственной Экспертизы" alt="Центр Государственной Экспертизы" /></a>
+             <a href="http://www.guion.spb.ru/" target="_blank"><img src="/img/partners/guion.jpg" title="Санкт-Петербургское государственное унитарное предприятие «Городское управление инвентаризации и оценки недвижимости»" alt="Санкт-Петербургское государственное унитарное предприятие «Городское управление инвентаризации и оценки недвижимости»" /></a>
+             <a href="http://www.kgainfo.spb.ru/" target="_blank"><img src="/img/partners/kga.jpg" title="Комитет по градостроительству и архитектуре Санкт-Петербурга" alt="Комитет по градостроительству и архитектуре Санкт-Петербурга" /></a>
+             <a href="http://www.gov.spb.ru/gov/admin/otrasl/komstroy" target="_blank"><img src="/img/partners/ks.jpg" title="Комитет по строительству" alt="Правительство Санкт-Петербурга. Комитет по строительству" /></a>
+             <a href="http://uksrest.ru/" target="_blank"><img src="/img/partners/restavr.jpg" title="Санкт-Петербургское государственное унитарное предприятие «Реставрация»" alt="Санкт-Петербургское государственное унитарное предприятие «Реставрация»" /></a>
+             <a href="http://www.stroysoyuz.ru/" target="_blank"><img src="/img/partners/ssoo.jpg" title="Союз строительных объединений и организаций" alt="Союз строительных объединений и организаций" /></a>
+             <a href="http://www.spbss.ru/" target="_blank"><img src="/img/partners/cc.jpg" title="Союз Страховщиков Санкт-Петербурга и Северо-Запада" alt="Союз Страховщиков Санкт-Петербурга и Северо-Запада" /></a>
+             <a href="http://www.expertiza.spb.ru/" target="_blank"><img src="/img/partners/stroynadzor.jpg" title="Служба государственного надзора и экспертизы Санкт-Петербурга" alt="Служба государственного надзора и экспертизы Санкт-Петербурга" /></a>
+             <a href="http://www.stateinvest.spb.ru/" target="_blank"><img src="/img/partners/ui.jpg" title="СПб ГУ «Управление инвестиций»" alt="СПб ГУ «Управление инвестиций»" /></a>
+		    </div>
+            <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
+		  </div>
+        </div>
+
+        {$right |noAutoescape}
+
+        <span class="footer_reserve"></span>
+      </div>
+      <div id="footer">
+        <ul>
+          <li><a href="/">Главная</a></li>
+          <li><a href="/contacts">Техническая поддержка</a></li>
+          <li><a href="/contacts">Подписка</a></li>
+          <li><a href="/contacts">Реклама</a></li>
+          <li><a href="/about">О портале</a></li>
+          <li><a href="/help">Помощь</a></li>
+        </ul>
+        <span class="copyright left">2010 &mdash; 2011 (c) <strong>ГдеСтройТорг.ру</strong> <br />&mdash; <a href="#">Единая система поиска поставщиков</a></span>
+      <!--  <span class="copyright right"><strong>При поддержке:</strong><br/><a href="www.ktostroit.ru"><img src="img/ktostroit.png" width="133" height="31" alt="" /></a></span> -->
+
+ </div>
+    </body>
+  </html>
+{/template}

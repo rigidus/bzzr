@@ -1,0 +1,231 @@
+// -*- mode: closure-template-html; fill-column: 140 -*-
+
+{namespace tpl}
+
+{template register}
+  <h2>Регистрация нового пользователя</h2>
+  <p>Для регистрации на портале заполните необходимую из анкет</p>
+  <div id="tabs">
+	<ul>
+	  <li><a href="#tabs-1">Поставщик</a></li>
+	  <li><a href="#tabs-2">Застройщик</a></li>
+	  <li><a href="#tabs-3">Физическое лицо</a></li>
+	</ul>
+
+	<div id="tabs-1">
+      <form method="POST">
+        <input type="hidden" name="usertype" value="supplier" />
+        <h3>Данные учетной записи</h3>
+        <dl class="table_display">
+          <dt>Логин<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="login" />Длина поля не менее 3 символов.</dd>
+          <dt>Email<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="email" />Пример: info@gst.ru</dd>
+          <dt>Пароль<sup>&lowast;</sup></dt>
+          <dd> <input name="password" type="password" />Длина поля не менее 8 символов</dd>
+          <dt>Повторите пароль<sup>&lowast;</sup></dt>
+          <dd> <input name="password-confirm" type="password" />Введите повторно пароль</dd>
+        </dl>
+        <h3>О компании</h3>
+        <dl class="table_display">
+          <dt>Полное название<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="name" />Пример: НОУ "Институт прикладной автоматизации и программирования"</dd>
+          <dt>Форма собственности<sup>&lowast;</sup></dt>
+          <dd>
+            {$rightform |noAutoescape}
+	      </dd>
+          <dt>ИНН<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="inn" />Длина поля не менее 10 символов</dd>
+          <dt>ОГРН</dt>
+          <dd> <input type="text" name="ogrn" />Длина поля не менее 13 символов</dd>
+        </dl>
+        <h3>Фактический адрес</h3>
+        <dl class="table_display">
+          <dt>Город<sup>&lowast;</sup></dt>
+          <dd><input type="text" name="city" /></dd>
+          <dt>Район</dt>
+          <dd><input type="text" name="district" /></dd>
+          <dt>Улица, дом, номер офиса e.t.c.<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="actual-address" /></dd>
+          <dt>Метро</dt>
+          <dd>
+            {$metro |noAutoescape}
+	      </dd>
+          <dt>Телефон<sup>&lowast;</sup></dt>
+          <dd><input type="text" name="phone" /></dd>
+          <dt>Факс</dt>
+          <dd><input type="text" name="fax" /></dd>
+          <dt>Веб-сайт</dt>
+          <dd><input type="text" name="site" /></dd>
+        </dl>
+        <h3>Специализация</h3>
+        <dl class="table_display">
+          <dt>Основная деятельность</dt>
+          <dd>
+            {$baseactivitysupplier |noAutoescape}
+	      </dd>
+          <dt>Смежные отрасли</dt>
+          <dd>
+            {$relatedindustry |noAutoescape}
+	      </dd>
+        </dl>
+        <h3>Контактное лицо</h3>
+        <dl class="table_display">
+          <dt>Фамилия Имя Отчество контактного лица<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="person" />Пример: Иванов Иван Иванович</dd>
+        </dl>
+        <h3>Правила работы</h3>
+        <dl class="table_display">
+          <dt>Соглашение</dt>
+          <dd>
+            <input type="checkbox" name="rules" id="access" />
+            <label for="access">Я ознакомлен (-а) и согласен (-a) с <a href="#">правилами работы на портале</a></label>
+          </dd>
+          <!--
+          <dt>Проверочный код<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="code" /></dd>
+          -->
+          <dt></dt>
+          <dd>
+		    <input type="submit" value="Согласен" />
+		    <input type="reset" name="Не согласен" value="Не согласен" />
+	      </dd>
+        </dl>
+      </form>
+	</div>
+
+
+
+
+	<div id="tabs-2">
+      <form method="POST">
+        <input type="hidden" name="usertype" value="builder" />
+
+        <h3>Данные учетной записи</h3>
+        <dl class="table_display">
+          <dt>Логин<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="login" />Длина поля не менее 3 символов.</dd>
+          <dt>Email<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="email" />Пример: info@gst.ru</dd>
+          <dt>Пароль<sup>&lowast;</sup></dt>
+          <dd> <input name="password" type="password" />Длина поля не менее 8 символов</dd>
+          <dt>Повторите пароль<sup>&lowast;</sup></dt>
+          <dd> <input name="password-confirm" type="password" />Введите повторно пароль</dd>
+        </dl>
+        <h3>О компании</h3>
+        <dl class="table_display">
+          <dt>Полное название<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="name" />Пример: НОУ "Институт прикладной автоматизации и программирования"</dd>
+          <dt>Форма собственности<sup>&lowast;</sup></dt>
+          <dd>
+            {$rightform |noAutoescape}
+	      </dd>
+          <dt>ИНН<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="inn" />Длина поля не менее 10 символов</dd>
+          <dt>ОГРН</dt>
+          <dd> <input type="text" name="ogrn" />Длина поля не менее 13 символов</dd>
+        </dl>
+        <h3>Фактический адрес</h3>
+        <dl class="table_display">
+          <dt>Город<sup>&lowast;</sup></dt>
+          <dd><input type="text" name="city" /></dd>
+          <dt>Район</dt>
+          <dd><input type="text" name="district" /></dd>
+          <dt>Улица, дом, номер офиса e.t.c.<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="actual-address" /></dd>
+          <dt>Метро</dt>
+          <dd>
+            {$metro |noAutoescape}
+	      </dd>
+          <dt>Телефон<sup>&lowast;</sup></dt>
+          <dd><input type="text" name="phone" /></dd>
+          <dt>Факс</dt>
+          <dd><input type="text" name="fax" /></dd>
+          <dt>Веб-сайт</dt>
+          <dd><input type="text" name="site" /></dd>
+        </dl>
+        <h3>Специализация</h3>
+        <dl class="table_display">
+          <dt>Основная деятельность</dt>
+          <dd>
+            {$baseactivitybuilder |noAutoescape}
+	      </dd>
+          <dt>Смежные отрасли</dt>
+          <dd>
+            {$relatedindustry |noAutoescape}
+	      </dd>
+        </dl>
+        <h3>Контактное лицо</h3>
+        <dl class="table_display">
+          <dt>Фамилия Имя Отчество контактного лица<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="person" />Пример: Иванов Иван Иванович</dd>
+        </dl>
+        <h3>Правила работы</h3>
+        <dl class="table_display">
+          <dt>Соглашение</dt>
+          <dd>
+            <input type="checkbox" name="rules" id="access" />
+            <label for="access">Я ознакомлен (-а) и согласен (-a) с <a href="#">правилами работы на портале</a></label>
+          </dd>
+          <!--
+          <dt>Проверочный код<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="code" /></dd>
+          -->
+          <dt></dt>
+          <dd>
+		    <input type="submit" value="Согласен" />
+		    <input type="reset" name="Не согласен" value="Не согласен" />
+	      </dd>
+        </dl>
+      </form>
+	</div>
+
+
+	<div id="tabs-3">
+      <form method="POST">
+        <input type="hidden" name="usertype" value="individual" />
+        <h3>Данные учетной записи</h3>
+        <dl class="table_display">
+          <dt>Логин<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="login" />Длина поля не менее 3 символов.</dd>
+          <dt>Email<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="email" />Пример: info@gst.ru</dd>
+          <dt>Пароль<sup>&lowast;</sup></dt>
+          <dd> <input name="password" type="password" />Длина поля не менее 8 символов</dd>
+          <dt>Повторите пароль<sup>&lowast;</sup></dt>
+          <dd> <input name="password-confirm" type="password" />Введите повторно пароль</dd>
+        </dl>
+        <h3>О себе</h3>
+        <dl class="table_display">
+        <dl class="table_display">
+          <dt>Фамилия Имя Отчество<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="person" />Пример: Иванов Иван Иванович</dd>
+          <dt>Телефон<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="phone" /></dd
+          <dt>Город<sup>&lowast;</sup></dt>
+          <dd><input type="text" name="city" /></dd>
+          <dt>Район</dt>
+          <dd><input type="text" name="distinct" /></dd>
+        </dl>
+        </dl>
+        <h3>Правила работы</h3>
+        <dl class="table_display">
+          <dt>Соглашение</dt>
+          <dd>
+            <input type="checkbox" name="rules" id="access" />
+            <label for="access">Я ознакомлен (-а) и согласен (-a) с <a href="#">правилами работы на портале</a></label>
+          </dd>
+          <!--
+          <dt>Проверочный код<sup>&lowast;</sup></dt>
+          <dd> <input type="text" name="code" /></dd>
+          -->
+          <dt></dt>
+          <dd>
+		    <input type="submit" value="Согласен" />
+		    <input type="reset" name="Не согласен" value="Не согласен" />
+	      </dd>
+        </dl>
+      </form>
+	</div>
+  </div>
+{/template}

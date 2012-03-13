@@ -1,0 +1,470 @@
+// -*- mode: closure-template-html; fill-column: 130 -*-
+
+{namespace tpl}
+
+
+{template old}
+  <link rel="stylesheet" href="/default.css" type="text/css" />{\n}
+  <link rel="stylesheet" href="/unique.css" type="text/css" />{\n}
+  <link rel="stylesheet" href="/content.css" type="text/css" />{\n}
+  <link rel="stylesheet" href="/general.css" type="text/css" />{\n}
+  <link rel="stylesheet" href="/templateBanner.css" type="text/css" />{\n}
+  <script type="text/javascript" src="/general.js"></script>{\n}
+{/template}
+
+
+{template loginform}
+  <div id="hidden_login" style="display:none">
+    <div class="enter_up">{\n}
+      <span><strong class="key">Авторизация</strong></span>
+      <form method="post" class="enter_form">
+        <input type="text" name="LOGIN" value="Логин" maxlength="64" onfocus="if(this.value=='Логин') this.value='';" onblur="if(this.value=='') this.value='Логин';"/>
+        <a href="#">Зарегистрироваться</a>
+        <input type="text" name="PASSWORD" value="Пароль" maxlength="64" onfocus="if(this.value=='Пароль') this.value='';" onblur="if(this.value=='') this.value='Пароль';"/>
+        <a href="#">Забыли пароль?</a>
+        <input type="submit" name="AUTH" value="Войти" style="background-color: #E0E0E0; width: 160px;" />
+      </form>
+    </div>
+  </div>
+
+  <script>
+  $(document).ready(function() {lb}
+    var $dialog = $('<div></div>')
+    .html($('#hidden_login').html())
+    .dialog({lb}
+      autoOpen: false,
+      title: 'Вход',
+      width: 240,
+      height: 240,
+      modal: true
+    {rb});
+    $('#opener_login').click(function() {lb}
+      $dialog.dialog('open');
+      return false;
+    {rb});
+  {rb});
+  </script>
+
+  <!-- input id="opener_{$id}" type="button" style="margin: 10px 0 10px 0;" value="{$value}" / -->
+
+  <div class="enter">
+    <a id="opener_login" class="key dot" href="#">
+      <span>Вход</span>
+    </a>|
+    <a href="/register">Регистрация</a>
+  </div>
+{/template}
+
+
+{template logoutform}
+  <div class="cabinet">
+    <form method="post" style="display:inline">{\n}
+      <input type="hidden" name="LOGOUT" value="Выход" />{\n}
+      <a href="#" class="right" onclick="jQuery(this).parent('form').submit()">{\n}
+        Выйти
+      </a>
+    </form>{\n}
+    <strong>Вы вошли как:</strong>
+    <a href="/{$usertype}/{$userid}">{$user} ({$login})</a>
+  </div>
+{/template}
+
+
+{template contentBlock}
+  <h2>{$title}</h2>
+  {$content |noAutoescape}{\n}
+{/template}
+
+
+{template navelt}
+  <li><a href="{$link}">{$title}</a></li>
+{/template}
+
+
+{template fld}
+  <table cellpadding="0" cellspacing="0">{\n}
+    <tbody>{\n}
+      <tr style="vertical-align: middle;">{\n}
+        <td width="250" style="padding: 0 4px 0 0; vertical-align: top; text-align: right; font-weight: bold;">{\n}
+          <div>{\n}
+            {$fldname}{\n}
+          </div>{\n}
+        </td>{\n}
+        <td width="550" style="padding: 0px; vertical-align: middle;">{\n}
+          <div>{\n}
+            {$fldcontent |noAutoescape}{\n}
+          </div>{\n}
+        </td>{\n}
+      </tr>{\n}
+    </tbody>{\n}
+  </table>{\n}
+{/template}
+
+
+{template gridview}
+  <div style="margin: 10px 0 10px 0">
+    <table id="{$idgrid}"></table>
+    <div id="{$idpager}"></div>
+    <script type="text/javascript">
+      jQuery("#{$idgrid}").jqGrid({$json |noAutoescape}).navGrid('#{$idpager}',{lb}edit:false,add:false,del:false{rb},
+        {lb}{rb}, // use default settings for edit
+        {lb}{rb}, // use default settings for add
+        {lb}{rb},  // delete instead that del:false we need this
+        {lb}
+          closeOnEscape : true,
+          sopt          : ['eq','ne','bw','bn','ew','en','cn','nc']
+        {rb}, // enable the advanced searching
+        {lb}{rb} // use default settings for view
+        );
+    </script>
+  </div>
+{/template}
+
+
+
+{template strupd}
+  <input type="text" name="{$name}" value="{$value}" style="width: 600px;" /><br />{\n}
+{/template}
+
+{template strview}
+  {$value}<br />{\n}
+{/template}
+
+
+{template txtupd}
+  <textarea name="{$name}" rows="6" col="120" style="width: 600px;" />{$value}</textarea> <br />{\n}
+{/template}
+
+{template txtview}
+  {$value}<br />{\n}
+{/template}
+
+
+
+{template dateupd}
+  <input type="text" name="{$name}" value="{$value}" style="width: 65px;" />{\n}
+  <br />
+{/template}
+
+
+{template intervalupd}
+  <input type="text" name="{$name}:begin" value="{$valuebegin}" style="width: 65px;" />{\n}
+  -
+  <input type="text" id="id-{$name}" name="{$name}:end" value="{$valueend}" style="width: 65px;" />{\n}
+  <br />
+{/template}
+
+
+{template flagupd}
+  <input type="checkbox" name="{$name}" value="T" {if $value} checked {/if} /> <br />{\n}
+{/template}
+
+
+{template fileupd}
+  <input type="file" name="{$name}" />{\n}
+{/template}
+
+
+{template selopt}
+  <OPTION value="{$id}">{$name}</OPTION>{\n}
+{/template}
+
+
+{template selres}
+  <SELECT name="{$name}" size="10">
+    {foreach $option in $options}
+      {call selopt data="$option" /}
+    {/foreach}
+  </SELECT>
+{/template}
+
+
+
+
+{template pswdupd}
+  <input type="password" name="{$name}" value="{$value}" style="width: 600px;" /> <br />{\n}
+{/template}
+
+
+{template btn}
+  <input type="button" name="{$name}" value="{$value}" onclick="jQuery(this).parent('form').submit()"/>
+{/template}
+
+
+{template btnlin}
+  <input type="hidden" name="{$name}" value="{$value}" />
+  <input type="button" onclick="jQuery(this).parent('form').submit()" style="margin: 10px 0 10px 0;" value="{$value}">
+{/template}
+
+
+{template btncol}
+  <form method="post">
+    <input type="button" name="{$name}" value="{$value}" onclick="jQuery(this).parent('form').submit()" value="{$value}">
+  </form>
+{/template}
+
+
+{template popbtnlin}
+  <div id="hidden_{$id}" style="display:none">
+    {$content |noAutoescape}
+  </div>
+
+  <script>{\n}
+  $(document).ready(function() {lb}{\n}
+    $('#hidden_{$id}').dialog({lb}{\n}
+      autoOpen: false,{\n}
+      title: '{$title |noAutoescape}',{\n}
+      width:  {$width},{\n}
+      height: {$height},{\n}
+      modal: true{\n}
+    {rb});{\n}
+    $('#opener_{$id}').click(function() {lb}{\n}
+      $('#hidden_{$id}').dialog('open');{\n}
+      return false;{\n}
+    {rb});{\n}
+  {rb});{\n}
+  </script>{\n}
+
+  <input id="opener_{$id}" type="button" style="margin: 10px 0 10px 0;" value="{$value}" />
+{/template}
+
+
+{template blk}
+  <!-- style="margin: 15px; border: 1px solid red;" -->
+  <div>
+    {if $title}<h2>{$title}</h2>{/if}
+    {$contents |noAutoescape}
+  </div>
+{/template}
+
+
+{template frmobj}
+  {\n}
+  <form method="post" enctype="multipart/form-data">{\n}
+    {$content |noAutoescape}{\n}
+  </form>{\n}
+{/template}
+
+
+{template frmtbl}
+  <table border="0" bgcolor="#DCDCDC" width="100%">
+    {foreach $obj in $objs}
+      <tr>
+        {foreach $fld in $obj}
+          <td bgcolor="#F1F1F1">
+            <div style="padding: 0px 3px 0px 3px;">
+              {$fld |noAutoescape}
+            </div>
+          </td>
+        {/foreach}
+      </tr>
+    {/foreach}
+  </table>
+{/template}
+
+
+{template col}
+<div style="border: 1px solid #7F9DB9; padding: 3px 5px 3px 5px;
+            background-color: #F1F1F1; margin: 3px 0px 3px 0px;">
+  <div style="padding: 3px 5px 3px 5px;"> {$title}</div>
+  <div style="border: 1px solid #7F9DB9; padding: 3px 5px 3px 5px;
+              background-color: #F1F1F1; background-color: #DCDCDC">
+    {$content |noAutoescape}
+  </div>
+</div>
+{/template}
+
+
+{template test}
+  <form method="POST" enctype="multipart/form-data">{\n}
+	<input type="file" name="file" value="" />{\n}
+    <input type="submit" />{\n}
+  </form>
+{/template}
+
+
+{template placemark}
+  // Создает метку и добавляет ее на карту{\n}
+  var placemark = new YMaps.Placemark(new YMaps.GeoPoint({$coord}));{\n}
+  placemark.name = "<a href=\"{$link}\">{$title}</a>";{\n}
+  placemark.description = "{$descr}";{\n}
+  map.addOverlay(placemark);{\n}
+  // Открывает балун{\n}
+  placemark.openBalloon();{\n}
+  {\n}
+{/template}
+
+
+{template map}
+<h2>{$title}</h2>
+<script type="text/javascript">{\n}
+    YMaps.jQuery(function () {lb}{\n}
+        // Создает экземпляр карты и привязывает его к созданному контейнеру{\n}
+        var map = new YMaps.Map(YMaps.jQuery("#YMapsID")[0]);{\n}
+        // Устанавливает начальные параметры отображения карты: центр карты и коэффициент масштабирования{\n}
+        map.setCenter(new YMaps.GeoPoint({$center}), {$scale});{\n}
+        map.addControl(new YMaps.TypeControl());{\n}
+        map.addControl(new YMaps.ToolBar());{\n}
+        map.addControl(new YMaps.Zoom());{\n}
+        map.addControl(new YMaps.MiniMap());{\n}
+        map.addControl(new YMaps.ScaleLine());{\n}
+        // Устанавливаем метки{\n}
+        {$placemarks |noAutoescape}{\n}
+    {rb}){\n}
+</script>{\n}
+<div id="YMapsID" style="width:600px;height:400px"></div>{\n}
+{/template}
+
+
+{template postannounce}
+  <table class="news_list" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; width: 97%;">
+    <tr>
+      <td style=" text-align: left; font-style: italic; width: 60px; ">
+        {$date}
+      </td>
+      <td>
+ 	    <h3><a href="/post/{$id}">{$title |noAutoescape}</a></h3>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+      	{$photoannounce  |noAutoescape}
+		{$announce  |noAutoescape}
+     </td>
+    </tr>
+  </table>
+{/template}
+
+
+{template posttext}
+  <table width="90%" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px;">
+    <tr>
+      <td>
+        <span class="data">{$date}</span>
+        <h2>{$title  |noAutoescape}</h2>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+         <span class="left">{$phototext  |noAutoescape}</span>
+         {$text  |noAutoescape}
+      </td>
+    </tr>
+  </table>
+{/template}
+
+
+{template analform}
+  <form method="get">
+    {$resource}<br />
+    <input type="hidden" name="resourceid" value="{$id}" />
+    <table>
+      <tbody>
+        <tr class="even">
+          <td class="filter_type">За период:</td>
+          <td class="filter_input">
+            <span>с</span>
+            <input name="begin" id="date_begin" value="01-01-2011" class="editdatefield hasDatepicker" type="text">
+            <span>по</span>
+            <input name="end"   id="date_end" value="07-12-2011" class="editdatefield hasDatepicker" type="text">
+          </td>
+        </tr>
+        <tr style="display: none;" class="odd" id="filter_scale">
+          <td class="filter_type">Масштаб:</td>
+          <td class="filter_input">
+            <select name="scale" id="scale" size="1">
+              <option value="1" selected="selected">по месяцам</option>
+              <option value="3">по кварталам</option>
+              <option value="12">по годам</option>
+            </select>
+          </td>
+        </tr>
+        <tr class="even">
+          <td class="filter_type">Тип цены:</td>
+          <td class="filter_input">
+            <select name="pt" id="estimate" size="1">
+              <option value="1">сметная</option>
+              <option value="0">оптовая</option>
+            </select>
+          </td>
+        </tr>
+        <tr class="odd">
+          <td class="filter_type">Вид:</td>
+          <td class="filter_input">
+            <select id="viewtype" size="1">
+              <!-- option value="0">таблица</option -->
+              <option value="1">график</option>
+              <option value="2">столбчатая диаграмма</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <input type="submit" />
+    <br />
+    {$result |noAutoescape}
+  </form>
+{/template}
+
+
+{template suppmap}
+  <h3>Условия поиска поставщиков строительных ресурсов</h3>
+  <form method="post">
+    <table>
+      <tr>
+        <td width="150">
+          Ресурс
+        </td>
+        <td>
+          <input type="text" name="resource" value="" style="width: 400px;" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Строительный объект
+        </td>
+        <td>
+          <input type="text" name="center" value="Санкт-Петербург, " style="width: 400px;" />
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <input type="submit" value="Найти" />
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          {$yamap |noAutoescape}
+        </td>
+      </tr>
+    </table>
+  </form>
+{/template}
+
+
+{template option}
+  <option value="{$value}" {if $selected} selected {/if}>{$title}</option>{\n}
+{/template}
+
+{template select}
+  <select name="{$name}">{\n}
+    {foreach $option in $options}
+      {call option data="$option" /}
+    {/foreach}
+  </select>{\n}
+{/template}
+
+
+{template checkbox}
+  <input type="checkbox" id="{$name}~{$value}" name="{$name}" value="{$value}" {if $checked} checked {/if} />{\n}
+  <label for="{$name}~{$value}">{$title}</label><br />{\n}
+{/template}
+
+
+{template checkboxgroup}
+  {foreach $checkbox in $checkboxes}
+    {call checkbox data="$checkbox"}
+      {param name: $name /}
+    {/call}
+  {/foreach}
+{/template}

@@ -1,0 +1,121 @@
+(in-package #:wizard)
+
+(restas:define-route register-page ("/register")
+  (let* ((personal  (let ((userid (hunchentoot:session-value 'userid)))
+                      (if (null userid)
+                          (tpl:loginform)
+                          (tpl:logoutform (list :user (a-name (gethash userid *USER*))
+                                                :login (a-login (gethash userid *USER*))
+                                                :usertype (string-downcase (type-of (gethash userid *USER*)))
+                                                :userid userid))))))
+  (tpl:root
+   (list
+    :mapkey         *mapkey*
+    :personal       personal
+    :right          (tpl:right)
+    :navpoints      (menu)
+    :searchcategory (aif (hunchentoot:post-parameter "searchcategory") it "")
+    :searchstring   (aif (hunchentoot:post-parameter "searchstring") it "")
+    :content        (funcall (find-symbol "REGISTER" 'tpl)
+                             (list :metro (select "metro" *metro* :empty t :selected :empty)
+                                   :rightform (select "rightform" *rightform*)
+                                   :baseactivitysupplier (checkboxgroup "base-activity-supplier[]" *base-activity-supplier*)
+                                   :baseactivitybuilder (checkboxgroup "base-activity-builder[]" *base-activity-builder*)
+                                   :relatedindustry (checkboxgroup "related-industry[]" *related-industry*)))))))
+
+
+
+
+
+(restas:define-route register/ctrs ("/register" :method :post)
+  (let ((session (hunchentoot:start-session))
+        (usertype (hunchentoot:post-parameter "usertype")))
+    (if (null usertype)
+        (activate nil)
+        (let* ((data-form (normalize-form-data (form-data)))
+               (content (block form-process
+                          (unless (getf data-form :rules)
+                            (return-from form-process "Для продолжения работы необходимо согласиться с правилами работы на портале!"))
+                          (when (or (null (getf data-form :login))
+                                    (> 3 (length (string-trim '(#\Space #\Tab #\Newline) (getf data-form :login)))))
+                            (return-from form-process "Введите логин не менее трех символов!"))
+                          (when (or (null (getf data-form :password))
+                                    (> 8 (length (string-trim '(#\Space #\Tab #\Newline) (getf data-form :password)))))
+                            (return-from form-process "Введите пароль не менее восьми символов!"))
+                          (when (or (null (getf data-form :password))
+                                    (null (getf data-form :password-confirm))
+                                    (not (equal
+                                          (string-trim '(#\Space #\Tab #\Newline) (getf data-form :password))
+                                          (string-trim '(#\Space #\Tab #\Newline) (getf data-form :password-confirm)))))
+                            (return-from form-process "Не совпадают пароль и подтверждение пароля!"))
+                          (when (or (null (getf data-form :email))
+                                    (> 4 (length (string-trim '(#\Space #\Tab #\Newline) (getf data-form :password)))))
+                            (return-from form-process "Введите правильный email!"))
+                          (cond ((equal "supplier" (getf data-form :usertype))
+                                 (multiple-value-bind (new id)
+                                     (mi 'supplier
+                                       :login                (getf data-form :login)
+                                       :password             (getf data-form :password)
+                                       :name                 (getf data-form :name)
+                                       :status               :unfair
+                                       :city                 (getf data-form :city)
+                                       :distinct             (getf data-form :distinct)
+                                       :metro                (getf data-form :metro)
+                                       :juridical-address    (getf data-form :actual-address)
+                                       :actual-address       (getf data-form :actual-address)
+                                       :phone                (getf data-form :phone)
+                                       :fax                  (getf data-form :fax)
+                                       :email                (getf data-form :email)
+                                       :site                 (getf data-form :site)
+                                       :inn                  (getf data-form :inn)
+                                       :rightform            (getf data-form :rightform)
+                                       :person               (getf data-form :person))
+                                   (return-from form-process 'ok)))
+                                ((equal "builder" (getf data-form :usertype))
+                                 (multiple-value-bind (new id)
+                                     (mi 'builder
+                                       :login                (getf data-form :login)
+                                       :password             (getf data-form :password)
+                                       :name                 (getf data-form :name)
+                                       :person               (getf data-form :person)
+                                       :phone                (getf data-form :phone)
+                                       :fax                  (getf data-form :fax)
+                                       :email                (getf data-form :email)
+                                       :juridical-address    (getf data-form :actual-address)
+                                       :actual-address       (getf data-form :actual-address)
+                                       :email                (getf data-form :email)
+                                       :site                 (getf data-form :site)
+                                       :inn                  (getf data-form :inn)
+                                       :ogrn                 (getf data-form :ogrn))
+                                   (return-from form-process 'ok)))
+                                ((equal "individual" (getf data-form :usertype))
+                                 (multiple-value-bind (new id)
+                                     (mi 'individual
+                                       :login                (getf data-form :login)
+                                       :password             (getf data-form :password)
+                                       :person               (getf data-form :person)
+                                       :phone                (getf data-form :phone)
+                                       :email                (getf data-form :email)
+                                       :email                (getf data-form :email))
+                                   (return-from form-process 'ok)))
+                                (t (format nil "not found type: ~A" (getf data-form :usertype)))))))
+          (let* ((personal  (let ((userid (hunchentoot:session-value 'userid)))
+                              (if (null userid)
+                                  (tpl:loginform)
+                                  (tpl:logoutform (list :user (a-name (gethash userid *USER*))
+                                                        :login (a-login (gethash userid *USER*))
+                                                        :usertype (string-downcase (type-of (gethash userid *USER*)))
+                                                        :userid userid))))))
+            (tpl:root
+             (list
+              :mapkey         *mapkey*
+              :personal       personal
+              :right          (tpl:right)
+              :navpoints      (menu)
+              :searchcategory (aif (hunchentoot:post-parameter "searchcategory") it "")
+              :searchstring   (aif (hunchentoot:post-parameter "searchstring") it "")
+              :content        (if (equal 'ok content)
+                                  "Вы зарегистрированы"
+                                  (format nil "~A<br /><br /><a href=\"javascript: history.back();\">Назад</a>" content)))))))))
+
+
